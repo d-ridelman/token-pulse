@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
+  <title>Token Pulse</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="renderer.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><div><div class="eyebrow" data-i18n="localTelemetry">ЛОКАЛЬНЫЕ ЗАМЕРЫ</div><h1>Token Pulse</h1></div></div>
+      <div class="header-right">
+        <div class="live-label"><span class="live-dot"></span><span data-i18n="localLogs">Журналы Codex</span><span class="separator">·</span><span data-i18n="checkFrequency">проверка каждые 100 мс</span></div>
+        <div class="language" role="group" aria-label="Language / Язык"><button type="button" id="lang-ru" aria-pressed="true">RU</button><button type="button" id="lang-en" aria-pressed="false">EN</button></div>
+      </div>
+    </header>
+
+    <section class="hero" aria-label="Token speed">
+      <div class="gauge-panel" aria-hidden="true">
+        <svg class="gauge" viewBox="0 0 340 180">
+          <defs><linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#22c55e"/><stop offset="58%" stop-color="#8bf2a8"/><stop offset="100%" stop-color="#dcfb83"/></linearGradient></defs>
+          <path class="gauge-track" d="M 36 150 A 134 134 0 0 1 304 150"/>
+          <path id="gauge-progress" class="gauge-progress" d="M 36 150 A 134 134 0 0 1 304 150"/>
+          <g class="gauge-ticks">
+            <line x1="36" y1="150" x2="52" y2="150"/><line x1="75" y1="55" x2="86" y2="66"/>
+            <line x1="170" y1="16" x2="170" y2="32"/><line x1="265" y1="55" x2="254" y2="66"/>
+            <line x1="304" y1="150" x2="288" y2="150"/>
+          </g>
+          <line id="gauge-needle" class="gauge-needle" x1="170" y1="150" x2="170" y2="42"/>
+          <circle class="gauge-hub-outer" cx="170" cy="150" r="13"/><circle class="gauge-hub" cx="170" cy="150" r="6"/>
+        </svg>
+        <div class="gauge-scale"><span>0</span><span id="gauge-mid">60</span><span id="gauge-max">120</span></div>
+        <div class="gauge-caption"><span class="activity-dot" aria-hidden="true"></span><span id="activity-phase">СТРЕЛКА ИДЁТ К ПОСЛЕДНЕМУ ЗАМЕРУ</span><span id="activity-elapsed"></span></div>
+      </div>
+      <div class="hero-main">
+        <div class="hero-heading"><div class="metric-label" data-i18n="heroLabel">Скорость свежих замеров</div><button type="button" id="show-all" class="show-all" hidden data-i18n="showAll">Все сессии</button></div>
+        <div class="hero-number"><span id="total-rate">—</span><span class="unit" data-i18n="unit">ток/с</span></div>
+        <div id="gauge-scope" class="gauge-scope" data-i18n="allScope">Все свежие сессии</div>
+        <div class="hero-caption" data-i18n="heroCaption">Сумма скоростей последних завершённых ответов. Новый замер появляется, когда Codex записывает расход токенов.</div>
+        <div class="fresh-info"><span class="live-dot"></span><strong id="fresh-count">0</strong><span data-i18n="freshSessions">свежих замеров</span><span class="separator">·</span><span data-i18n="freshWindow">Замер за последние 75 сек.</span><span id="activity-summary" class="activity-summary" hidden><span class="separator">·</span><strong id="activity-count">0</strong><span data-i18n="activityEvents">сигналов активности</span></span></div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="section-head"><div><div class="eyebrow" data-i18n="recent">СЕЙЧАС И НЕДАВНО</div><h2 data-i18n="sessions">Сессии</h2></div><div id="checked" class="updated" data-i18n="waiting">Ожидание данных</div></div>
+      <div id="error" class="error" hidden></div>
+      <div id="sessions" class="sessions"></div>
+      <div id="empty" class="empty" hidden><div class="empty-ring" aria-hidden="true"></div><h3 data-i18n="emptyTitle">Пока нет свежих замеров</h3><p data-i18n="emptyBody">Запустите задачу в Codex. Ход появится сразу, а скорость — после первой записи токенов.</p></div>
+    </section>
+
+    <footer><span data-i18n="sourceNote">Источник: CODEX_HOME/sessions или ~/.codex/sessions</span><span data-i18n="chatgptNote">Обычные веб-чаты ChatGPT здесь не измеряются</span></footer>
+  </main>
+</body>
+</html>

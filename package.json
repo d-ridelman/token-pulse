@@ -1,0 +1,39 @@
+{
+  "name": "token-pulse",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Token Pulse contributors",
+  "license": "MIT",
+  "description": "Local Codex session token speed monitor",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "node node_modules/electron/install.js && electron .",
+    "test": "node --test monitor.test.cjs",
+    "build:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "dev.tokenpulse.app",
+    "productName": "Token Pulse",
+    "asar": true,
+    "directories": { "output": "release" },
+    "files": [
+      "package.json",
+      "main.cjs",
+      "preload.cjs",
+      "monitor.cjs",
+      "share.cjs",
+      "index.html",
+      "renderer.js",
+      "style.css",
+      "LICENSE"
+    ],
+    "win": {
+      "target": "portable",
+      "artifactName": "Token-Pulse-${version}-${arch}.${ext}"
+    }
+  }
+}

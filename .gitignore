@@ -1,0 +1,10 @@
+node_modules/
+release/
+dist/
+out/
+*.log
+*.jsonl
+.env
+.env.*
+.codex/
+.DS_Store
