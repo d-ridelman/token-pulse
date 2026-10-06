@@ -28,15 +28,7 @@
 
 ## Демо
 
-<p align="center">
-  <a href="https://github.com/d-ridelman/token-pulse/releases/download/v1.0.0/Token-Pulse-demo-30fps.mp4">
-    <img src="assets/demo-preview.png" alt="Token Pulse во время TypeScript-задачи на GPT-6.1 Sol MAX" width="850">
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/d-ridelman/token-pulse/releases/download/v1.0.0/Token-Pulse-demo-30fps.mp4"><strong>▶ Видео в реальном времени — 30 секунд, 30 FPS (MP4)</strong></a>
-</p>
+https://github.com/user-attachments/assets/8a51b5d2-c77f-42e7-b4c7-74762be95c4c
 
 На видео — одна TypeScript-задача на **GPT-6.1 Sol MAX**; все десять проверок прошли. Показанная скорость относится к одному завершённому ответу, а не к модели вообще и не к сравнению токенизаторов. Записано только окно Token Pulse, без звука.
 
