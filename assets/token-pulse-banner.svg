@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title description">
+  <title id="title">Token Pulse</title>
+  <desc id="description">A dark navy banner with a green pulse icon and a speedometer.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1120"/>
+      <stop offset="1" stop-color="#17263d"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#22c55e" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#22c55e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="speed" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#a3f6ad"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" rx="28" fill="url(#background)"/>
+  <circle cx="1000" cy="185" r="260" fill="url(#glow)"/>
+  <path d="M0 267H1200" stroke="#294258" stroke-width="1"/>
+  <rect x="72" y="68" width="62" height="62" rx="17" fill="#172a3f" stroke="#3b6572"/>
+  <rect x="88" y="90" width="6" height="18" rx="3" fill="#4ade80"/>
+  <rect x="101" y="80" width="6" height="37" rx="3" fill="#8df4a7"/>
+  <rect x="114" y="86" width="6" height="26" rx="3" fill="#4ade80"/>
+  <text x="157" y="115" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="57" font-weight="750" letter-spacing="-2">Token Pulse</text>
+  <text x="75" y="173" fill="#9ff2b4" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="3">LOCAL CODEX TELEMETRY</text>
+  <text x="75" y="221" fill="#b9c9d8" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="19">A clearer view of completed-response speed and live activity.</text>
+  <text x="75" y="296" fill="#90a8b9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13" letter-spacing="2">LOCAL FIRST  ·  RU / EN  ·  OPEN SOURCE</text>
+  <path d="M893 241A118 118 0 0 1 1129 241" fill="none" stroke="#3e5966" stroke-width="14" stroke-linecap="round"/>
+  <path d="M893 241A118 118 0 0 1 947 141" fill="none" stroke="url(#speed)" stroke-width="14" stroke-linecap="round"/>
+  <line x1="1011" y1="241" x2="954" y2="159" stroke="#f6fff5" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="1011" cy="241" r="13" fill="#263c43" stroke="#9af5ac" stroke-width="3"/>
+  <circle cx="1011" cy="241" r="5" fill="#f6fff5"/>
+  <text x="884" y="264" fill="#bde3d0" font-family="Consolas, monospace" font-size="13">0</text>
+  <text x="1108" y="264" fill="#bde3d0" font-family="Consolas, monospace" font-size="13">TPS</text>
+</svg>
