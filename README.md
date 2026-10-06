@@ -42,7 +42,7 @@ The video shows one TypeScript task on **GPT-6.1 Sol MAX**; its ten tests passed
 
 ## What you see
 
-| | |
+| Feature | What it shows |
 |---|---|
 | **Measured speed** | Output tokens per second for the latest completed model response. The numeric value changes only after a usage record arrives. |
 | **Live activity** | A running turn timer, the latest observed Codex event, and an activity-signal count between speed measurements. These do not invent unreported tokens. |
