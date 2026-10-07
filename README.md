@@ -69,9 +69,9 @@ The UI supports **RU / EN**, with Russian as the default. `TOKEN_PULSE_LANG` set
 
 ## Reading the number
 
-Token Pulse primarily reads Codex `token_usage_record` events. It divides a completed response's reported output tokens by the time from the nearest available pre-request event (turn start or last tool output) to its usage record. Older logs use the difference between cumulative `token_count` events; the method appears on each card.
+Token Pulse primarily reads Codex `token_usage_record` events. When a completed assistant item supplies `started_at_ms`, it divides the response's reported output tokens by the time from the first `Reasoning` or `AgentMessage` item start to the usage record. This omits observed pre-output latency. If that boundary is unavailable, it uses the time from the nearest pre-request event (turn start or last tool output) to the usage record. Older logs can fall back to differences between cumulative `token_count` events. The method appears on each card.
 
-Output tokens can include reasoning and other non-visible output. The timing can include request latency. The local log does not expose the exact first-token time or a token-by-token stream, so this is **effective completed-response throughput**, not instantaneous decoding speed. [OpenAI's token counting guide](https://developers.openai.com/api/docs/guides/token-counting) explains what reported output includes.
+Output tokens can include reasoning and other non-visible output. An assistant item's start is an approximation of the first token, and the usage record may arrive after generation ends. The local log does not expose the exact first-token time or a token-by-token stream, so this remains **estimated completed-response throughput**, not exact decoding speed. [OpenAI's token counting guide](https://developers.openai.com/api/docs/guides/token-counting) explains what reported output includes.
 
 Active files are checked every 100 ms, with filesystem notifications when available. A measurement remains “recent” for 75 seconds; a card remains visible for 20 minutes. The turn timer and activity signals continue to move between usage records. The model badge uses the latest `turn_context.model` and `effort`; backend rerouting is not independently verified.
 

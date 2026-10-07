@@ -50,6 +50,7 @@ const translations = {
     cli: 'Codex CLI',
     codex: 'Codex',
     clientHelp: 'Клиент, через который запущена сессия. Это не название модели.',
+    outputStartMethod: 'Первый элемент ответа',
     responseMethod: 'По завершённому ответу',
     intervalMethod: 'По интервалу записей',
     noRate: 'Ожидание второго замера',
@@ -110,6 +111,7 @@ const translations = {
     cli: 'Codex CLI',
     codex: 'Codex',
     clientHelp: 'The client that started this session, not the model name.',
+    outputStartMethod: 'First response item',
     responseMethod: 'Completed response',
     intervalMethod: 'Usage record interval',
     noRate: 'Waiting for another sample',
@@ -257,8 +259,9 @@ function renderSession(session, now) {
   const client = element('span', '', `${t('client')}: ${sourceName(session.source)}`);
   client.title = t('clientHelp');
   meta.append(client);
-  meta.append(element('span', 'method', session.method === 'response'
-    ? t('responseMethod') : session.method === 'interval' ? t('intervalMethod') : t('noRate')));
+  meta.append(element('span', 'method', session.method === 'output_start'
+    ? t('outputStartMethod') : session.method === 'response'
+      ? t('responseMethod') : session.method === 'interval' ? t('intervalMethod') : t('noRate')));
   meta.append(element('span', 'session-id', session.id.slice(0, 8)));
   foot.append(meta);
   const button = element('button', 'copy-button', t('copy'));

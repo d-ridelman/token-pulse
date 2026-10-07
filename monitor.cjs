@@ -96,13 +96,23 @@ function makeSample(state, at, total, responseTokens, origin) {
   const previous = state.samples.at(-1);
   let duration = state.lastInputAt ? (at - state.lastInputAt) / 1000 : null;
   let method = 'response';
-  if (!Number.isFinite(duration) || duration < 0.5 || duration > 600 || !Number.isFinite(responseTokens)) {
+  // Codex records the start of an assistant item, not the first streamed token.
+  // This boundary removes observed pre-output latency without claiming exact decode time.
+  const outputDuration = state.firstOutputAt != null && state.lastInputAt != null
+    && state.firstOutputAt >= state.lastInputAt ? (at - state.firstOutputAt) / 1000 : null;
+  if (Number.isFinite(responseTokens) && Number.isFinite(outputDuration)
+      && outputDuration >= 0.2 && outputDuration <= 600) {
+    duration = outputDuration;
+    method = 'output_start';
+  }
+  if (!Number.isFinite(duration) || duration < (method === 'output_start' ? 0.2 : 0.5)
+      || duration > 600 || !Number.isFinite(responseTokens)) {
     duration = previous ? (at - previous.at) / 1000 : null;
     responseTokens = previous ? total.output_tokens - previous.output : null;
     method = 'interval';
   }
   const valid = Number.isFinite(duration) && duration >= 0.2
-    && duration <= (method === 'response' ? 600 : 120)
+    && duration <= (method === 'interval' ? 120 : 600)
     && Number.isFinite(responseTokens) && responseTokens >= 0;
   return addSample(state, {
     at,
@@ -130,7 +140,9 @@ function markActivity(state, at, phase) {
 function addLine(state, line) {
   if (!line.includes('token_usage_record') && !line.includes('token_count')
       && !line.includes('turn_context') && !line.includes('custom_tool_call_output')
+      && !line.includes('function_call_output')
       && !line.includes('custom_tool_call') && !line.includes('reasoning')
+      && !line.includes('item_completed')
       && !line.includes('task_started') && !line.includes('task_complete')
       && !line.includes('turn_aborted') && !line.includes('"type":"message"')) return false;
   let item;
@@ -141,13 +153,28 @@ function addLine(state, line) {
     if (typeof item.payload?.model === 'string') state.model = item.payload.model;
     if (typeof item.payload?.effort === 'string') state.effort = item.payload.effort;
     state.lastInputAt = at;
+    state.firstOutputAt = null;
     if (!state.turnActive) state.turnStartedAt = at;
     state.turnActive = true;
     return markActivity(state, at, 'working');
   }
-  if (item.type === 'response_item' && item.payload?.type === 'custom_tool_call_output') {
+  if (item.type === 'response_item' && (item.payload?.type === 'custom_tool_call_output'
+      || item.payload?.type === 'function_call_output')) {
     state.lastInputAt = at;
+    state.firstOutputAt = null;
     return markActivity(state, at, 'working');
+  }
+  if (item.type === 'event_msg' && item.payload?.type === 'item_completed') {
+    const kind = item.payload.item?.type;
+    const started = item.payload.started_at_ms;
+    const completed = item.payload.completed_at_ms;
+    if ((kind === 'Reasoning' || kind === 'AgentMessage')
+        && Number.isFinite(started) && Number.isFinite(completed)
+        && state.lastInputAt != null && started >= state.lastInputAt
+        && started <= completed && completed <= at) {
+      state.firstOutputAt = Math.min(state.firstOutputAt ?? started, started);
+    }
+    return false;
   }
   if (item.type === 'response_item' && item.payload?.type === 'custom_tool_call') {
     return markActivity(state, at, 'tool');
@@ -160,6 +187,7 @@ function addLine(state, line) {
   }
   if (item.type === 'event_msg' && item.payload?.type === 'task_started') {
     state.lastInputAt = at;
+    state.firstOutputAt = null;
     state.turnActive = true;
     state.turnStartedAt = at;
     return markActivity(state, at, 'working');
@@ -173,12 +201,17 @@ function addLine(state, line) {
     const changed = makeSample(state, at, item.payload?.thread_token_usage,
       item.payload?.usage?.output_tokens, 'usage_record');
     state.lastInputAt = at;
+    state.firstOutputAt = null;
     return markActivity(state, at) || changed;
   }
   if (item.type === 'event_msg' && item.payload?.type === 'token_count') {
     const changed = makeSample(state, at, item.payload.info?.total_token_usage,
       item.payload.info?.last_token_usage?.output_tokens, 'token_count');
-    if (changed) return markActivity(state, at);
+    if (changed) {
+      state.lastInputAt = at;
+      state.firstOutputAt = null;
+      return markActivity(state, at);
+    }
     return false;
   }
   return false;
@@ -206,7 +239,7 @@ class TokenMonitor {
     let state = this.files.get(file);
     if (!state || size < state.offset) {
       state = { file, offset: 0, partial: '', samples: [], model: null, effort: null,
-        lastInputAt: null, firstSeenAt: Date.now(), turnActive: false, turnStartedAt: null,
+        lastInputAt: null, firstOutputAt: null, firstSeenAt: Date.now(), turnActive: false, turnStartedAt: null,
         activityAt: null, activityCount: 0, phase: 'idle', ...readMeta(file, size) };
       state.inScope = !this.projectDir || isWithinProject(state.cwd, this.projectDir);
       this.files.set(file, state);

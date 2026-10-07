@@ -74,6 +74,51 @@ test('uses response usage and model, ignoring a later duplicate token event', ()
   }
 });
 
+test('uses the first completed assistant item as an output-start boundary', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'token-pulse-test-'));
+  try {
+    const file = path.join(root, 'session.jsonl');
+    const start = Date.parse('2026-10-06T12:00:00Z');
+    const line = (seconds, type, payload) => JSON.stringify({
+      timestamp: new Date(start + seconds * 1000).toISOString(), type, payload,
+    }) + '\n';
+    const item = (seconds, kind, started, completed) => line(seconds, 'event_msg', {
+      type: 'item_completed', item: { type: kind },
+      started_at_ms: start + started * 1000, completed_at_ms: start + completed * 1000,
+    });
+    const usage = (seconds, output, total) => line(seconds, 'token_usage_record', {
+      usage: { output_tokens: output }, thread_token_usage: { output_tokens: total },
+    });
+    fs.writeFileSync(file, line(0, 'turn_context', { model: 'gpt-test' })
+      + item(1, 'UserMessage', 0, 0.5)
+      + item(5, 'Reasoning', 2, 4.9)
+      + usage(10, 200, 200)
+      + line(12, 'response_item', { type: 'function_call_output' })
+      + item(15, 'Reasoning', 14, 14.8)
+      + usage(20, 120, 320)
+      + line(22, 'response_item', { type: 'custom_tool_call_output' })
+      + item(24, 'Reasoning', 11, 23) // stale start before the tool result
+      + usage(30, 80, 400));
+    const monitor = new TokenMonitor(root);
+    monitor.scan();
+    const samples = monitor.files.get(file).samples;
+    assert.equal(samples[0].method, 'output_start');
+    assert.equal(samples[0].duration, 8);
+    assert.equal(samples[0].rate, 25);
+    assert.match(formatShare(samples[0], 'en'), /first response item to usage record/);
+    assert.equal(samples[1].method, 'output_start');
+    assert.equal(samples[1].duration, 6);
+    assert.equal(samples[1].rate, 20);
+    assert.equal(samples[2].method, 'response');
+    assert.equal(samples[2].duration, 8);
+    assert.equal(samples[2].rate, 10);
+    assert.match(formatShare(monitor.snapshot(start + 31_000).sessions[0], 'en'),
+      /completed model response/);
+  } finally {
+    if (root.startsWith(os.tmpdir() + path.sep)) fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('project scope excludes other sessions and reports model effort', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'token-pulse-test-'));
   try {

@@ -8,9 +8,11 @@ function formatShare(session, language = 'ru', version = '0.2.0') {
   const model = String((session.model || (en ? 'Unknown' : 'Неизвестна'))
     + (session.effort ? ` · ${session.effort.toUpperCase()}` : ''))
     .replace(/[\r\n]/g, ' ').slice(0, 80);
-  const method = session.method === 'response'
-    ? (en ? 'completed model response' : 'завершённый ответ модели')
-    : (en ? 'interval between usage records' : 'интервал между записями');
+  const method = session.method === 'output_start'
+    ? (en ? 'first response item to usage record' : 'от первого элемента ответа до записи расхода')
+    : session.method === 'response'
+      ? (en ? 'completed model response' : 'завершённый ответ модели')
+      : (en ? 'interval between usage records' : 'интервал между записями');
   return en
     ? `Token Pulse v${version}
 Model: ${model}
